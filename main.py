@@ -39,14 +39,20 @@ def main():
     load_img2_btn = QPushButton ( "Load Image 2" )
 
     # For Block1
-    Block1_btn_separation = QPushButton ( "1.1 Colors Separation" )
-    Block1_btn_transformation = QPushButton ( "1.2 Color Transformation" )
-    Block1_btn_extraction = QPushButton ( "1.3 Color Extraction" )
+    Block1_btn_1_1 = QPushButton ( "1.1 Colors Separation" )
+    Block1_btn_1_2 = QPushButton ( "1.2 Color Transformation" )
+    Block1_btn_1_3 = QPushButton ( "1.3 Color Extraction" )
 
     # For Block2
-    Block2_btn_Gaussian = QPushButton ( "2.1 Gaussian blur" )
-    Block2_btn_Bilateral = QPushButton ( "2.2 Bilateral blur" )
-    Block2_btn_Median = QPushButton ( "2.3 Median blur" )
+    Block2_btn_2_1 = QPushButton ( "2.1 Gaussian blur" )
+    Block2_btn_2_2 = QPushButton ( "2.2 Bilateral blur" )
+    Block2_btn_2_3 = QPushButton ( "2.3 Median blur" )
+
+    # For Block3
+    Block3_btn_3_1 = QPushButton ( "3.1 Sobel X" )
+    Block3_btn_3_2 = QPushButton ( "3.2 Sobel Y" )
+    Block3_btn_3_3 = QPushButton ( "3.3 Combination and Threshold" )
+    Block3_btn_3_4 = QPushButton ( "3.4 Gradient Angle" )
 
 
     # ----------------------------------- #
@@ -55,22 +61,26 @@ def main():
     # For Block1
     Block1_layout = QVBoxLayout()
     Block1_layout.addWidget ( QLabel ( "1. Image Processing" ) )
-    Block1_layout.addWidget ( Block1_btn_separation )
-    Block1_layout.addWidget ( Block1_btn_transformation )
-    Block1_layout.addWidget ( Block1_btn_extraction )
+    Block1_layout.addWidget ( Block1_btn_1_1 )
+    Block1_layout.addWidget ( Block1_btn_1_2 )
+    Block1_layout.addWidget ( Block1_btn_1_3 )
     block1.setLayout ( Block1_layout )
 
     # For Block2
     Block2_layout = QVBoxLayout()
     Block2_layout.addWidget ( QLabel ( "2. Image Smoothing" ) )
-    Block2_layout.addWidget ( Block2_btn_Gaussian )
-    Block2_layout.addWidget ( Block2_btn_Bilateral )
-    Block2_layout.addWidget ( Block2_btn_Median )
+    Block2_layout.addWidget ( Block2_btn_2_1 )
+    Block2_layout.addWidget ( Block2_btn_2_2 )
+    Block2_layout.addWidget ( Block2_btn_2_3 )
     block2.setLayout ( Block2_layout )
 
     # For Block3
     Block3_layout = QVBoxLayout()
     Block3_layout.addWidget ( QLabel ( "3. Edge Detection" ) )
+    Block3_layout.addWidget ( Block3_btn_3_1 )
+    Block3_layout.addWidget ( Block3_btn_3_2 )
+    Block3_layout.addWidget ( Block3_btn_3_3 )
+    Block3_layout.addWidget ( Block3_btn_3_4 )
     block3.setLayout ( Block3_layout )
 
     # For Block4
@@ -121,24 +131,37 @@ def main():
         print ( "Loaded Image 2" )
 
     # For Block 1
-    def Block1_btn_separation_clicked():
+    def Block1_btn_1_1_clicked():
         print ( "Color Separation button clicked" )
 
-    def Block1_btn_transformation_clicked():
+    def Block1_btn_1_2_clicked():
         print ( "Color Transformation button clicked" )
 
-    def Block1_btn_extraction_clicked():
+    def Block1_btn_1_3_clicked():
         print ( "Color Extraction button clicked" )
 
     # For Block 2
-    def Block2_btn_Gaussian_clicked():
+    def Block2_btn_2_1_clicked():
         print ( "Gaussian blur button clicked" )
 
-    def Block2_btn_Bilateral_clicked():
+    def Block2_btn_2_2_clicked():
         print ( "Bilateral blur button clicked" )
 
-    def Block2_btn_Median_clicked():
+    def Block2_btn_2_3_clicked():
         print ( "Median blur button clicked" )
+
+    # For Block 3
+    def Block3_btn_3_1_clicked():
+        print ( "Sobel X buttom clicked" )
+
+    def Block3_btn_3_2_clicked():
+        print ( "Sobel Y buttom clicked" )
+
+    def Block3_btn_3_3_clicked():
+        print ( "Combination and Thresold buttom clicked" )
+        
+    def Block3_btn_3_4_clicked():
+        print ( "Gradient Angle buttom clicked" )
 
 
     # ----------------------------------- #
@@ -149,14 +172,20 @@ def main():
     load_img2_btn.clicked.connect ( load_img2_btn_clicked )
 
     # For Block 1
-    Block1_btn_separation.clicked.connect ( Block1_btn_separation_clicked )
-    Block1_btn_transformation.clicked.connect ( Block1_btn_transformation_clicked )
-    Block1_btn_extraction.clicked.connect ( Block1_btn_extraction_clicked )
+    Block1_btn_1_1.clicked.connect ( Block1_btn_1_1_clicked )
+    Block1_btn_1_2.clicked.connect ( Block1_btn_1_2_clicked )
+    Block1_btn_1_3.clicked.connect ( Block1_btn_1_3_clicked )
 
     # For Block 2
-    Block2_btn_Gaussian.clicked.connect ( Block2_btn_Gaussian_clicked )
-    Block2_btn_Bilateral.clicked.connect ( Block2_btn_Bilateral_clicked )
-    Block2_btn_Median.clicked.connect ( Block2_btn_Median_clicked )
+    Block2_btn_2_1.clicked.connect ( Block2_btn_2_1_clicked )
+    Block2_btn_2_2.clicked.connect ( Block2_btn_2_2_clicked )
+    Block2_btn_2_3.clicked.connect ( Block2_btn_2_3_clicked )
+
+    # For Block 3
+    Block3_btn_3_1.clicked.connect ( Block3_btn_3_1_clicked )
+    Block3_btn_3_2.clicked.connect ( Block3_btn_3_2_clicked )
+    Block3_btn_3_3.clicked.connect ( Block3_btn_3_3_clicked )
+    Block3_btn_3_4.clicked.connect ( Block3_btn_3_4_clicked )
 
 
     # ----------------------------------- #
