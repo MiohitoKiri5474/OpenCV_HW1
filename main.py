@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit
 
 def main():
     app = QApplication(sys.argv)
@@ -54,6 +54,20 @@ def main():
     Block3_btn_3_3 = QPushButton ( "3.3 Combination and Threshold" )
     Block3_btn_3_4 = QPushButton ( "3.4 Gradient Angle" )
 
+    # For Block4
+    Block4_btn_transforms = QPushButton ( "4. Transforms" )
+    Block4_input_rotation = QLineEdit()
+    Block4_input_scaling = QLineEdit()
+    Block4_input_TX = QLineEdit()
+    Block4_input_TY = QLineEdit()
+
+    # For Block5
+    Block5_btn_load_img = QPushButton ( "Load Image" )
+    Block5_btn_5_1 = QPushButton ( "5.1 Show Agumented Images" )
+    Block5_btn_5_2 = QPushButton ( "5.2 Show Model Structure" )
+    Block5_btn_5_3 = QPushButton ( "5.3 Show Acc and Loss" )
+    Block5_btn_5_4 = QPushButton ( "5.4 Inference" )
+
 
     # ----------------------------------- #
     # Add BTN into each lable
@@ -84,14 +98,149 @@ def main():
     block3.setLayout ( Block3_layout )
 
     # For Block4
+    Block4_l1 = QWidget()
+    Block4_l1_layout = QVBoxLayout()
+    Block4_l1_layout.addWidget ( QLabel ( "Rotation (deg):" ) )
+    Block4_l1_layout.addWidget ( QLabel ( "Scaling       :" ) )
+    Block4_l1_layout.addWidget ( QLabel ( "Tx     (pixel):" ) )
+    Block4_l1_layout.addWidget ( QLabel ( "Ty     (pixel):" ) )
+    Block4_l1.setLayout ( Block4_l1_layout )
+
+    Block4_l2 = QWidget()
+    Block4_l2_layout = QVBoxLayout()
+    Block4_l2_layout.addWidget ( Block4_input_rotation )
+    Block4_l2_layout.addWidget ( Block4_input_scaling )
+    Block4_l2_layout.addWidget ( Block4_input_TX )
+    Block4_l2_layout.addWidget ( Block4_input_TY )
+    Block4_l2.setLayout ( Block4_l2_layout )
+    
+    Block4_top_layout = QHBoxLayout()
+    Block4_top_layout.addWidget ( Block4_l1 )
+    Block4_top_layout.addWidget ( Block4_l2 )
+
+    Block4_down_layout = QHBoxLayout()
+    Block4_down_layout.addWidget ( Block4_btn_transforms )
+
+
     Block4_layout = QVBoxLayout()
     Block4_layout.addWidget ( QLabel ( "4. Transforms" ) )
+    Block4_layout.addLayout ( Block4_top_layout )
+    Block4_layout.addLayout ( Block4_down_layout )
     block4.setLayout ( Block4_layout )
 
     # For Block5
     Block5_layout = QVBoxLayout()
     Block5_layout.addWidget ( QLabel ( "5. VGG19" ) )
+    Block5_layout.addWidget ( Block5_btn_load_img )
+    Block5_layout.addWidget ( Block5_btn_5_1 )
+    Block5_layout.addWidget ( Block5_btn_5_2 )
+    Block5_layout.addWidget ( Block5_btn_5_3 )
+    Block5_layout.addWidget ( Block5_btn_5_4 )
+    Block5_layout.addWidget ( QLabel ( "Predict = " ) )
     block5.setLayout ( Block5_layout )
+
+
+   
+    # ----------------------------------- #
+    # Define functions of each btn
+
+    # For load images over all
+    def load_img1_btn_clicked():
+        print ( "Loaded Image 1" )
+
+    def load_img2_btn_clicked():
+        print ( "Loaded Image 2" )
+
+    # For Block1
+    def Block1_btn_1_1_clicked():
+        print ( "Color Separation button clicked" )
+
+    def Block1_btn_1_2_clicked():
+        print ( "Color Transformation button clicked" )
+
+    def Block1_btn_1_3_clicked():
+        print ( "Color Extraction button clicked" )
+
+    # For Block2
+    def Block2_btn_2_1_clicked():
+        print ( "Gaussian blur button clicked" )
+
+    def Block2_btn_2_2_clicked():
+        print ( "Bilateral blur button clicked" )
+
+    def Block2_btn_2_3_clicked():
+        print ( "Median blur button clicked" )
+
+    # For Block3
+    def Block3_btn_3_1_clicked():
+        print ( "Sobel X button clicked" )
+
+    def Block3_btn_3_2_clicked():
+        print ( "Sobel Y button clicked" )
+
+    def Block3_btn_3_3_clicked():
+        print ( "Combination and Thresold button clicked" )
+        
+    def Block3_btn_3_4_clicked():
+        print ( "Gradient Angle button clicked" )
+
+    # For Block4
+    def Block4_btn_transforms_clicked():
+        print ( "Transforms button clicked" )
+        print ( "Rotation: ", Block4_input_rotation.text() )
+        print ( "Scaling: ", Block4_input_scaling.text() )
+        print ( "Tx: ", Block4_input_TX.text() )
+        print ( "Ty: ", Block4_input_TY.text() )
+
+    # For Block5
+    def Block5_btn_load_img_clicked():
+        print ( "Load Image button clicked" )
+
+    def Block5_btn_5_1_clicked():
+        print ( "Show Agumented Images button clicked" )
+
+    def Block5_btn_5_2_clicked():
+        print ( "Show Model Structure button clicked" )
+
+    def Block5_btn_5_3_clicked():
+        print ( "Show Acc and Loss button clicked" )
+
+    def Block5_btn_5_4_clicked():
+        print ( "Inference button clicked" )
+
+
+    # ----------------------------------- #
+    # Connect functions and btns
+
+    # For load images over all
+    load_img1_btn.clicked.connect ( load_img1_btn_clicked )
+    load_img2_btn.clicked.connect ( load_img2_btn_clicked )
+
+    # For Block1
+    Block1_btn_1_1.clicked.connect ( Block1_btn_1_1_clicked )
+    Block1_btn_1_2.clicked.connect ( Block1_btn_1_2_clicked )
+    Block1_btn_1_3.clicked.connect ( Block1_btn_1_3_clicked )
+
+    # For Block2
+    Block2_btn_2_1.clicked.connect ( Block2_btn_2_1_clicked )
+    Block2_btn_2_2.clicked.connect ( Block2_btn_2_2_clicked )
+    Block2_btn_2_3.clicked.connect ( Block2_btn_2_3_clicked )
+
+    # For Block3
+    Block3_btn_3_1.clicked.connect ( Block3_btn_3_1_clicked )
+    Block3_btn_3_2.clicked.connect ( Block3_btn_3_2_clicked )
+    Block3_btn_3_3.clicked.connect ( Block3_btn_3_3_clicked )
+    Block3_btn_3_4.clicked.connect ( Block3_btn_3_4_clicked )
+
+    # For Block4
+    Block4_btn_transforms.clicked.connect ( Block4_btn_transforms_clicked )
+
+    # For Block5
+    Block5_btn_load_img.clicked.connect ( Block5_btn_load_img_clicked )
+    Block5_btn_5_1.clicked.connect ( Block5_btn_5_1_clicked )
+    Block5_btn_5_2.clicked.connect ( Block5_btn_5_2_clicked )
+    Block5_btn_5_3.clicked.connect ( Block5_btn_5_3_clicked )
+    Block5_btn_5_4.clicked.connect ( Block5_btn_5_4_clicked )
 
 
     # ----------------------------------- #
@@ -118,74 +267,6 @@ def main():
     # Set the main layout for the window
 
     window.setLayout(main_layout)
-
-   
-    # ----------------------------------- #
-    # Define functions of each btn
-
-    # For load images over all
-    def load_img1_btn_clicked():
-        print ( "Loaded Image 1" )
-
-    def load_img2_btn_clicked():
-        print ( "Loaded Image 2" )
-
-    # For Block 1
-    def Block1_btn_1_1_clicked():
-        print ( "Color Separation button clicked" )
-
-    def Block1_btn_1_2_clicked():
-        print ( "Color Transformation button clicked" )
-
-    def Block1_btn_1_3_clicked():
-        print ( "Color Extraction button clicked" )
-
-    # For Block 2
-    def Block2_btn_2_1_clicked():
-        print ( "Gaussian blur button clicked" )
-
-    def Block2_btn_2_2_clicked():
-        print ( "Bilateral blur button clicked" )
-
-    def Block2_btn_2_3_clicked():
-        print ( "Median blur button clicked" )
-
-    # For Block 3
-    def Block3_btn_3_1_clicked():
-        print ( "Sobel X buttom clicked" )
-
-    def Block3_btn_3_2_clicked():
-        print ( "Sobel Y buttom clicked" )
-
-    def Block3_btn_3_3_clicked():
-        print ( "Combination and Thresold buttom clicked" )
-        
-    def Block3_btn_3_4_clicked():
-        print ( "Gradient Angle buttom clicked" )
-
-
-    # ----------------------------------- #
-    # Connect functions and btns
-
-    # For load images over all
-    load_img1_btn.clicked.connect ( load_img1_btn_clicked )
-    load_img2_btn.clicked.connect ( load_img2_btn_clicked )
-
-    # For Block 1
-    Block1_btn_1_1.clicked.connect ( Block1_btn_1_1_clicked )
-    Block1_btn_1_2.clicked.connect ( Block1_btn_1_2_clicked )
-    Block1_btn_1_3.clicked.connect ( Block1_btn_1_3_clicked )
-
-    # For Block 2
-    Block2_btn_2_1.clicked.connect ( Block2_btn_2_1_clicked )
-    Block2_btn_2_2.clicked.connect ( Block2_btn_2_2_clicked )
-    Block2_btn_2_3.clicked.connect ( Block2_btn_2_3_clicked )
-
-    # For Block 3
-    Block3_btn_3_1.clicked.connect ( Block3_btn_3_1_clicked )
-    Block3_btn_3_2.clicked.connect ( Block3_btn_3_2_clicked )
-    Block3_btn_3_3.clicked.connect ( Block3_btn_3_3_clicked )
-    Block3_btn_3_4.clicked.connect ( Block3_btn_3_4_clicked )
 
 
     # ----------------------------------- #
