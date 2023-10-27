@@ -2,6 +2,8 @@ import sys
 
 import cv2
 
+import numpy as np
+
 from PyQt5.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -153,6 +155,7 @@ def main():
     # ----------------------------------- #
     # Define functions of each btn of related
 
+    # General
     def get_path():
         global file_name
         file_name = QFileDialog.getOpenFileName ( None, 'open file', '.' )[0]
@@ -179,12 +182,51 @@ def main():
     # For Block1
     def Block1_btn_1_1_clicked():
         print("Color Separation button clicked")
+        if image1 is None:
+            print ( "[ERROR]: Please load image first" )
+            return
+
+        b, g, r = cv2.split ( image1 )
+
+        zeros = np.zeros_like ( b )
+
+        cv2.imshow ( "Blue Image", cv2.merge ( ( b, zeros, zeros ) ) )
+        cv2.imshow ( "Green Image", cv2.merge ( ( zeros, g, zeros ) ) )
+        cv2.imshow ( "Red Image", cv2.merge ( ( zeros, zeros, r ) ) )
+
+        cv2.waitKey ( 0 )
+        cv2.destroyAllWindows()
 
     def Block1_btn_1_2_clicked():
         print("Color Transformation button clicked")
+        if image1 is None:
+            print ( "[ERROR]: Please load image first" )
+            return
+
+        b, g, r = cv2.split ( image1 )
+        avg = ( r + g + b ) // 3
+
+        cv2.imshow ( "OpenCV function", cv2.cvtColor ( image1, cv2.COLOR_BGR2GRAY ) )
+        cv2.imshow ( "Average weighted", cv2.merge ( ( avg, avg, avg ) ) )
+
+        cv2.waitKey ( 0 )
+        cv2.destroyAllWindows()
 
     def Block1_btn_1_3_clicked():
         print("Color Extraction button clicked")
+
+        if image1 is None:
+            print ( "[ERROR]: Please load image first" )
+            return
+
+        hsv_img = cv2.cvtColor ( image1, cv2.COLOR_BGR2HSV )
+        mask = cv2.bitwise_not ( cv2.inRange ( hsv_img, np.array ( [15, 25, 25] ), np.array ( [85, 255, 255] ) ) )
+
+        cv2.imshow ( "I1 mask", cv2.bitwise_not ( mask ) )
+        cv2.imshow ( "Extracted Color", cv2.bitwise_and ( image1, image1, mask = mask ) )
+
+        cv2.waitKey ( 0 )
+        cv2.destroyAllWindows()
 
     # For Block2
     def Block2_btn_2_1_clicked():
