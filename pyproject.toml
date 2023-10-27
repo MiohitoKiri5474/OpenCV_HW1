@@ -8,6 +8,7 @@ packages = [{include = "opencv_hw"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+opencv-python = "^4.8.1.78"
 
 
 [build-system]

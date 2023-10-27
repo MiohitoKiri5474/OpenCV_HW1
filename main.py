@@ -1,5 +1,7 @@
 import sys
 
+import cv2
+
 from PyQt5.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -8,7 +10,12 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QWidget,
+    QFileDialog,
 )
+
+file_name = None
+image1 = None
+image2 = None
 
 
 def main():
@@ -144,14 +151,30 @@ def main():
     block5.setLayout(Block5_layout)
 
     # ----------------------------------- #
-    # Define functions of each btn
+    # Define functions of each btn of related
+
+    def get_path():
+        global file_name
+        file_name = QFileDialog.getOpenFileName ( None, 'open file', '.' )[0]
 
     # For load images over all
     def load_img1_btn_clicked():
-        print("Loaded Image 1")
+        global image1
+        get_path()
+        image1 = cv2.imread ( file_name )
+        if image1 is None:
+            print ( "[ERROR]: Image cannot load" )
+        else:
+            print("Loaded Image 1", file_name)
 
     def load_img2_btn_clicked():
-        print("Loaded Image 2")
+        global image2
+        get_path()
+        image2 = cv2.imread ( file_name )
+        if image2 is None:
+            print ( "[ERROR]: Image cannot load" )
+        else:
+            print("Loaded Image 2", file_name)
 
     # For Block1
     def Block1_btn_1_1_clicked():
