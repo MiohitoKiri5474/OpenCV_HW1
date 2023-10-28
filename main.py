@@ -1,5 +1,7 @@
 import sys
 
+import time
+
 import cv2
 import numpy as np
 from PyQt5.QtWidgets import (
@@ -61,9 +63,9 @@ def main():
     Block1_btn_1_3 = QPushButton("1.3 Color Extraction")
 
     # For Block2
-    Block2_btn_2_1 = QPushButton("2.1 Gaussian blur")
-    Block2_btn_2_2 = QPushButton("2.2 Bilateral blur")
-    Block2_btn_2_3 = QPushButton("2.3 Median blur")
+    Block2_btn_2_1 = QPushButton("2.1 Gaussian Blur")
+    Block2_btn_2_2 = QPushButton("2.2 Bilateral Filter")
+    Block2_btn_2_3 = QPushButton("2.3 Median Filter")
 
     # For Block3
     Block3_btn_3_1 = QPushButton("3.1 Sobel X")
@@ -248,20 +250,52 @@ def main():
                 cv2.destroyAllWindows()
                 break
 
-            img = image1
             current_radius = cv2.getTrackbarPos ( 'm:', 'Gaussian Blur' )
-
             sz = ( 2 * current_radius + 1, 2 * current_radius + 1 )
 
-            img = cv2.GaussianBlur ( image1, sz, 0 )
-            cv2.imshow ( 'Gaussian Blur', img )
+            cv2.imshow ( 'Gaussian Blur', cv2.GaussianBlur ( image1, sz, 0 ) )
 
 
     def Block2_btn_2_2_clicked():
-        print("Bilateral blur button clicked")
+        print("Bilateral Filter button clicked")
+
+        if image1 is None:
+            print ( "[ERROR]: Please load image first" )
+            return
+
+        cv2.namedWindow ( 'Bilateral Filter' )
+        cv2.createTrackbar ( 'm:', 'Bilateral Filter', 1, 5, update_radius )
+
+        while True:
+            if cv2.waitKey ( 1 ) & 0xFF == ord ( 'q' ):
+                cv2.destroyAllWindows()
+                break
+
+            current_radius = cv2.getTrackbarPos ( 'm:', 'Bilateral Filter' )
+            cv2.imshow ( 'Bilateral Filter', cv2.bilateralFilter ( image1, 0, 90, 90, 2 * current_radius + 1 ) )
+
+            time.sleep ( 60 )
+
 
     def Block2_btn_2_3_clicked():
-        print("Median blur button clicked")
+        print("Median Fliter button clicked")
+
+        if image1 is None:
+            print ( "[ERROR]: Please load image first" )
+            return
+
+        cv2.namedWindow ( 'Median Filter' )
+        cv2.createTrackbar ( 'm:', 'Median Filter', 1, 5, update_radius )
+
+        while True:
+            if cv2.waitKey ( 1 ) & 0xFF == ord ( 'q' ):
+                cv2.destroyAllWindows()
+                break
+
+            current_radius = cv2.getTrackbarPos ( 'm:', 'Median Filter' )
+            cv2.imshow ( 'Median Filter', cv2.medianBlur ( image1, 2 * current_radius + 1 ) )
+
+
 
     # For Block3
     def Block3_btn_3_1_clicked():
