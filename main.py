@@ -2,6 +2,8 @@ import sys
 
 import time
 
+from scipy import signal
+
 import cv2
 import numpy as np
 from PyQt5.QtWidgets import (
@@ -17,11 +19,38 @@ from PyQt5.QtWidgets import (
 
 file_name = None
 image1 = None
+image1_gray = None
 image2 = None
 
 def update_radius(value):
     global window_radius
     window_radius = value
+
+def _GaussianBlur ( img ):
+    kernel = np.array(
+            [
+                [0.045, 0.122, 0.045],
+                [0.122, 0.332, 0.122],
+                [0.045, 0.122, 0.045],
+            ]
+        )
+
+    return signal.convolve2d(img, kernel, mode="same", boundary="symm").astype( np.uint8 )
+
+def Sobel ( img, op ):
+    if img is None:
+        print ( "[ERROR]: Please load image first" )
+        return None
+
+    result = signal.convolve2d ( _GaussianBlur ( img ), op, mode = "same", boundary = "symm" )
+
+    result = abs ( result )
+    result = (
+        (result - np.amin(result)) * 255 / (np.amax(result) - np.amin(result))
+    ).astype(np.uint8)
+    result = cv2.cvtColor(result, cv2.COLOR_GRAY2BGR)
+
+    return result
 
 
 def main():
@@ -167,8 +196,10 @@ def main():
     # For load images over all
     def load_img1_btn_clicked():
         global image1
+        global image1_gray
         get_path()
         image1 = cv2.imread(file_name)
+        image1_gray = cv2.imread ( file_name, cv2.IMREAD_GRAYSCALE )
         if image1 is None:
             print("[ERROR]: Image cannot load")
         else:
@@ -266,15 +297,19 @@ def main():
         cv2.namedWindow ( 'Bilateral Filter' )
         cv2.createTrackbar ( 'm:', 'Bilateral Filter', 1, 5, update_radius )
 
+        img_list = []
+        for i in range ( 6 ):
+            print ( 'Bilateral Filter img producting: ', i )
+            img_list.append ( cv2.bilateralFilter ( image1, 0, 90, 90, 2 * i + 1 ) )
+            cv2.imshow ( str ( i ), img_list[i] )
+
         while True:
             if cv2.waitKey ( 1 ) & 0xFF == ord ( 'q' ):
                 cv2.destroyAllWindows()
                 break
 
             current_radius = cv2.getTrackbarPos ( 'm:', 'Bilateral Filter' )
-            cv2.imshow ( 'Bilateral Filter', cv2.bilateralFilter ( image1, 0, 90, 90, 2 * current_radius + 1 ) )
-
-            time.sleep ( 60 )
+            cv2.imshow ( 'Bilateral Filter', img_list[current_radius] )
 
 
     def Block2_btn_2_3_clicked():
@@ -301,11 +336,60 @@ def main():
     def Block3_btn_3_1_clicked():
         print("Sobel X button clicked")
 
+        if image1_gray is None:
+            print ( "[ERROR]: Please load image first" )
+            return
+
+        sobel_operator = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+        result = Sobel ( image1_gray, sobel_operator )
+
+        cv2.imshow ( "Sobel X", result )
+
+
+        cv2.waitKey ( 0 )
+        cv2.destroyAllWindows()
+
+
     def Block3_btn_3_2_clicked():
         print("Sobel Y button clicked")
 
+        if image1_gray is None:
+            print ( "[ERROR]: Please load image first" )
+            return
+
+        sobel_operator = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
+        result = Sobel ( image1_gray, sobel_operator )
+
+        cv2.imshow ( "Sobel Y", result )
+
+
+        cv2.waitKey ( 0 )
+        cv2.destroyAllWindows()
+
     def Block3_btn_3_3_clicked():
-        print("Combination and Thresold button clicked")
+        print("Combination and Threshold button clicked")
+
+        if image1_gray is None:
+            print ( "[ERROR]: Please load image first" )
+            return
+
+        result_x = Sobel ( image1_gray, np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]) )
+        result_y = Sobel ( image1_gray, np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]) )
+
+        result = ( result_x ** 2 + result_y ** 2 ) ** 0.5
+
+        result = (
+            (result - np.amin(result)) * 255 / (np.amax(result) - np.amin(result))
+        ).astype(np.uint8)
+
+        _, threshold = cv2.threshold ( result, 128, 255, cv2.THRESH_BINARY )
+
+        cv2.imshow ( "Combination of Sobel x and Sobel y", result )
+        cv2.imshow ( "Threshold", threshold )
+
+
+        cv2.waitKey ( 0 )
+        cv2.destroyAllWindows()
 
     def Block3_btn_3_4_clicked():
         print("Gradient Angle button clicked")
