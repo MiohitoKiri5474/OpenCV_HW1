@@ -1,56 +1,294 @@
 import sys
-
 import time
-
-from scipy import signal
 
 import cv2
 import numpy as np
-from PyQt5.QtWidgets import (
-    QApplication,
-    QFileDialog,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt5.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLabel,
+                             QLineEdit, QPushButton, QVBoxLayout, QWidget)
+from scipy import signal
 
 file_name = None
 image1 = None
 image1_gray = None
 image2 = None
 
+
 def update_radius(value):
     global window_radius
     window_radius = value
 
-def _GaussianBlur ( img ):
+
+def _GaussianBlur(img):
     kernel = np.array(
-            [
-                [0.045, 0.122, 0.045],
-                [0.122, 0.332, 0.122],
-                [0.045, 0.122, 0.045],
-            ]
-        )
+        [
+            [0.045, 0.122, 0.045],
+            [0.122, 0.332, 0.122],
+            [0.045, 0.122, 0.045],
+        ]
+    )
 
-    return signal.convolve2d(img, kernel, mode="same", boundary="symm").astype( np.uint8 )
+    return signal.convolve2d(img, kernel, mode="same", boundary="symm").astype(np.uint8)
 
-def Sobel ( img, op ):
+
+def Sobel(img, op):
     if img is None:
-        print ( "[ERROR]: Please load image first" )
+        print("[ERROR]: Please load image first")
         return None
 
-    result = signal.convolve2d ( _GaussianBlur ( img ), op, mode = "same", boundary = "symm" )
+    result = signal.convolve2d(_GaussianBlur(img), op, mode="same", boundary="symm")
 
-    result = abs ( result )
+    result = abs(result)
     result = (
         (result - np.amin(result)) * 255 / (np.amax(result) - np.amin(result))
     ).astype(np.uint8)
     result = cv2.cvtColor(result, cv2.COLOR_GRAY2BGR)
 
     return result
+
+
+# ----------------------------------- #
+# Define functions of each btn of related
+
+
+# General
+def get_path():
+    global file_name
+    file_name = QFileDialog.getOpenFileName(None, "open file", ".")[0]
+
+
+# For load images over all
+def load_img1_btn_clicked():
+    global image1
+    global image1_gray
+    get_path()
+    image1 = cv2.imread(file_name)
+    image1_gray = cv2.imread(file_name, cv2.IMREAD_GRAYSCALE)
+    if image1 is None:
+        print("[ERROR]: Image cannot load")
+    else:
+        print("Loaded Image 1", file_name)
+
+
+def load_img2_btn_clicked():
+    global image2
+    get_path()
+    image2 = cv2.imread(file_name)
+    if image2 is None:
+        print("[ERROR]: Image cannot load")
+    else:
+        print("Loaded Image 2", file_name)
+
+
+# For Block1
+def Block1_btn_1_1_clicked():
+    print("Color Separation button clicked")
+    if image1 is None:
+        print("[ERROR]: Please load image first")
+        return
+
+    b, g, r = cv2.split(image1)
+
+    zeros = np.zeros_like(b)
+
+    cv2.imshow("Blue Image", cv2.merge((b, zeros, zeros)))
+    cv2.imshow("Green Image", cv2.merge((zeros, g, zeros)))
+    cv2.imshow("Red Image", cv2.merge((zeros, zeros, r)))
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def Block1_btn_1_2_clicked():
+    print("Color Transformation button clicked")
+    if image1 is None:
+        print("[ERROR]: Please load image first")
+        return
+
+    b, g, r = cv2.split(image1)
+    avg = (r + g + b) // 3
+
+    cv2.imshow("OpenCV function", cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY))
+    cv2.imshow("Average weighted", cv2.merge((avg, avg, avg)))
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def Block1_btn_1_3_clicked():
+    print("Color Extraction button clicked")
+
+    if image1 is None:
+        print("[ERROR]: Please load image first")
+        return
+
+    hsv_img = cv2.cvtColor(image1, cv2.COLOR_BGR2HSV)
+    mask = cv2.bitwise_not(
+        cv2.inRange(hsv_img, np.array([15, 25, 25]), np.array([85, 255, 255]))
+    )
+
+    cv2.imshow("I1 mask", cv2.bitwise_not(mask))
+    cv2.imshow("Extracted Color", cv2.bitwise_and(image1, image1, mask=mask))
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+# For Block2
+def Block2_btn_2_1_clicked():
+    print("Gaussian blur button clicked")
+
+    if image1 is None:
+        print("[ERROR]: Please load image first")
+        return
+
+    cv2.namedWindow("Gaussian Blur")
+    cv2.createTrackbar("m:", "Gaussian Blur", 1, 5, update_radius)
+
+    while True:
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            cv2.destroyAllWindows()
+            break
+
+        current_radius = cv2.getTrackbarPos("m:", "Gaussian Blur")
+        sz = (2 * current_radius + 1, 2 * current_radius + 1)
+
+        cv2.imshow("Gaussian Blur", cv2.GaussianBlur(image1, sz, 0))
+
+
+def Block2_btn_2_2_clicked():
+    print("Bilateral Filter button clicked")
+
+    if image1 is None:
+        print("[ERROR]: Please load image first")
+        return
+
+    cv2.namedWindow("Bilateral Filter")
+    cv2.createTrackbar("m:", "Bilateral Filter", 1, 5, update_radius)
+
+    img_list = []
+    for i in range(6):
+        print("Bilateral Filter img producting: ", i)
+        img_list.append(cv2.bilateralFilter(image1, 0, 90, 90, 2 * i + 1))
+        cv2.imshow(str(i), img_list[i])
+
+    while True:
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            cv2.destroyAllWindows()
+            break
+
+        current_radius = cv2.getTrackbarPos("m:", "Bilateral Filter")
+        cv2.imshow("Bilateral Filter", img_list[current_radius])
+
+
+def Block2_btn_2_3_clicked():
+    print("Median Fliter button clicked")
+
+    if image1 is None:
+        print("[ERROR]: Please load image first")
+        return
+
+    cv2.namedWindow("Median Filter")
+    cv2.createTrackbar("m:", "Median Filter", 1, 5, update_radius)
+
+    while True:
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            cv2.destroyAllWindows()
+            break
+
+        current_radius = cv2.getTrackbarPos("m:", "Median Filter")
+        cv2.imshow("Median Filter", cv2.medianBlur(image1, 2 * current_radius + 1))
+
+
+# For Block3
+def Block3_btn_3_1_clicked():
+    print("Sobel X button clicked")
+
+    if image1_gray is None:
+        print("[ERROR]: Please load image first")
+        return
+
+    sobel_operator = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+    result = Sobel(image1_gray, sobel_operator)
+
+    cv2.imshow("Sobel X", result)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def Block3_btn_3_2_clicked():
+    print("Sobel Y button clicked")
+
+    if image1_gray is None:
+        print("[ERROR]: Please load image first")
+        return
+
+    sobel_operator = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
+    result = Sobel(image1_gray, sobel_operator)
+
+    cv2.imshow("Sobel Y", result)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def Block3_btn_3_3_clicked():
+    print("Combination and Threshold button clicked")
+
+    if image1_gray is None:
+        print("[ERROR]: Please load image first")
+        return
+
+    result_x = Sobel(image1_gray, np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]))
+    result_y = Sobel(image1_gray, np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]))
+
+    result = (result_x**2 + result_y**2) ** 0.5
+
+    result = (
+        (result - np.amin(result)) * 255 / (np.amax(result) - np.amin(result))
+    ).astype(np.uint8)
+
+    _, threshold = cv2.threshold(result, 128, 255, cv2.THRESH_BINARY)
+
+    cv2.imshow("Combination of Sobel x and Sobel y", result)
+    cv2.imshow("Threshold", threshold)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def Block3_btn_3_4_clicked():
+    print("Gradient Angle button clicked")
+
+
+# For Block4
+def Block4_btn_transforms_clicked():
+    print("Transforms button clicked")
+    print("Rotation: ", Block4_input_rotation.text())
+    print("Scaling: ", Block4_input_scaling.text())
+    print("Tx: ", Block4_input_TX.text())
+    print("Ty: ", Block4_input_TY.text())
+
+
+# For Block5
+def Block5_btn_load_img_clicked():
+    print("Load Image button clicked")
+
+
+def Block5_btn_5_1_clicked():
+    print("Show Agumented Images button clicked")
+
+
+def Block5_btn_5_2_clicked():
+    print("Show Model Structure button clicked")
+
+
+def Block5_btn_5_3_clicked():
+    print("Show Acc and Loss button clicked")
+
+
+def Block5_btn_5_4_clicked():
+    print("Inference button clicked")
 
 
 def main():
@@ -184,239 +422,6 @@ def main():
     Block5_layout.addWidget(Block5_btn_5_4)
     Block5_layout.addWidget(QLabel("Predict = "))
     block5.setLayout(Block5_layout)
-
-    # ----------------------------------- #
-    # Define functions of each btn of related
-
-    # General
-    def get_path():
-        global file_name
-        file_name = QFileDialog.getOpenFileName(None, "open file", ".")[0]
-
-    # For load images over all
-    def load_img1_btn_clicked():
-        global image1
-        global image1_gray
-        get_path()
-        image1 = cv2.imread(file_name)
-        image1_gray = cv2.imread ( file_name, cv2.IMREAD_GRAYSCALE )
-        if image1 is None:
-            print("[ERROR]: Image cannot load")
-        else:
-            print("Loaded Image 1", file_name)
-
-    def load_img2_btn_clicked():
-        global image2
-        get_path()
-        image2 = cv2.imread(file_name)
-        if image2 is None:
-            print("[ERROR]: Image cannot load")
-        else:
-            print("Loaded Image 2", file_name)
-
-    # For Block1
-    def Block1_btn_1_1_clicked():
-        print("Color Separation button clicked")
-        if image1 is None:
-            print("[ERROR]: Please load image first")
-            return
-
-        b, g, r = cv2.split(image1)
-
-        zeros = np.zeros_like(b)
-
-        cv2.imshow("Blue Image", cv2.merge((b, zeros, zeros)))
-        cv2.imshow("Green Image", cv2.merge((zeros, g, zeros)))
-        cv2.imshow("Red Image", cv2.merge((zeros, zeros, r)))
-
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-    def Block1_btn_1_2_clicked():
-        print("Color Transformation button clicked")
-        if image1 is None:
-            print("[ERROR]: Please load image first")
-            return
-
-        b, g, r = cv2.split(image1)
-        avg = (r + g + b) // 3
-
-        cv2.imshow("OpenCV function", cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY))
-        cv2.imshow("Average weighted", cv2.merge((avg, avg, avg)))
-
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-    def Block1_btn_1_3_clicked():
-        print("Color Extraction button clicked")
-
-        if image1 is None:
-            print("[ERROR]: Please load image first")
-            return
-
-        hsv_img = cv2.cvtColor(image1, cv2.COLOR_BGR2HSV)
-        mask = cv2.bitwise_not(
-            cv2.inRange(hsv_img, np.array([15, 25, 25]), np.array([85, 255, 255]))
-        )
-
-        cv2.imshow("I1 mask", cv2.bitwise_not(mask))
-        cv2.imshow("Extracted Color", cv2.bitwise_and(image1, image1, mask=mask))
-
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-    # For Block2
-    def Block2_btn_2_1_clicked():
-        print("Gaussian blur button clicked")
-        
-        if image1 is None:
-            print ( "[ERROR]: Please load image first" )
-            return
-
-        cv2.namedWindow ( 'Gaussian Blur' )
-        cv2.createTrackbar ( 'm:', 'Gaussian Blur', 1, 5, update_radius )
-
-        while True:
-            if cv2.waitKey ( 1 ) & 0xFF == ord ( 'q' ):
-                cv2.destroyAllWindows()
-                break
-
-            current_radius = cv2.getTrackbarPos ( 'm:', 'Gaussian Blur' )
-            sz = ( 2 * current_radius + 1, 2 * current_radius + 1 )
-
-            cv2.imshow ( 'Gaussian Blur', cv2.GaussianBlur ( image1, sz, 0 ) )
-
-
-    def Block2_btn_2_2_clicked():
-        print("Bilateral Filter button clicked")
-
-        if image1 is None:
-            print ( "[ERROR]: Please load image first" )
-            return
-
-        cv2.namedWindow ( 'Bilateral Filter' )
-        cv2.createTrackbar ( 'm:', 'Bilateral Filter', 1, 5, update_radius )
-
-        img_list = []
-        for i in range ( 6 ):
-            print ( 'Bilateral Filter img producting: ', i )
-            img_list.append ( cv2.bilateralFilter ( image1, 0, 90, 90, 2 * i + 1 ) )
-            cv2.imshow ( str ( i ), img_list[i] )
-
-        while True:
-            if cv2.waitKey ( 1 ) & 0xFF == ord ( 'q' ):
-                cv2.destroyAllWindows()
-                break
-
-            current_radius = cv2.getTrackbarPos ( 'm:', 'Bilateral Filter' )
-            cv2.imshow ( 'Bilateral Filter', img_list[current_radius] )
-
-
-    def Block2_btn_2_3_clicked():
-        print("Median Fliter button clicked")
-
-        if image1 is None:
-            print ( "[ERROR]: Please load image first" )
-            return
-
-        cv2.namedWindow ( 'Median Filter' )
-        cv2.createTrackbar ( 'm:', 'Median Filter', 1, 5, update_radius )
-
-        while True:
-            if cv2.waitKey ( 1 ) & 0xFF == ord ( 'q' ):
-                cv2.destroyAllWindows()
-                break
-
-            current_radius = cv2.getTrackbarPos ( 'm:', 'Median Filter' )
-            cv2.imshow ( 'Median Filter', cv2.medianBlur ( image1, 2 * current_radius + 1 ) )
-
-
-
-    # For Block3
-    def Block3_btn_3_1_clicked():
-        print("Sobel X button clicked")
-
-        if image1_gray is None:
-            print ( "[ERROR]: Please load image first" )
-            return
-
-        sobel_operator = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
-        result = Sobel ( image1_gray, sobel_operator )
-
-        cv2.imshow ( "Sobel X", result )
-
-
-        cv2.waitKey ( 0 )
-        cv2.destroyAllWindows()
-
-
-    def Block3_btn_3_2_clicked():
-        print("Sobel Y button clicked")
-
-        if image1_gray is None:
-            print ( "[ERROR]: Please load image first" )
-            return
-
-        sobel_operator = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-        result = Sobel ( image1_gray, sobel_operator )
-
-        cv2.imshow ( "Sobel Y", result )
-
-
-        cv2.waitKey ( 0 )
-        cv2.destroyAllWindows()
-
-    def Block3_btn_3_3_clicked():
-        print("Combination and Threshold button clicked")
-
-        if image1_gray is None:
-            print ( "[ERROR]: Please load image first" )
-            return
-
-        result_x = Sobel ( image1_gray, np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]) )
-        result_y = Sobel ( image1_gray, np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]) )
-
-        result = ( result_x ** 2 + result_y ** 2 ) ** 0.5
-
-        result = (
-            (result - np.amin(result)) * 255 / (np.amax(result) - np.amin(result))
-        ).astype(np.uint8)
-
-        _, threshold = cv2.threshold ( result, 128, 255, cv2.THRESH_BINARY )
-
-        cv2.imshow ( "Combination of Sobel x and Sobel y", result )
-        cv2.imshow ( "Threshold", threshold )
-
-
-        cv2.waitKey ( 0 )
-        cv2.destroyAllWindows()
-
-    def Block3_btn_3_4_clicked():
-        print("Gradient Angle button clicked")
-
-    # For Block4
-    def Block4_btn_transforms_clicked():
-        print("Transforms button clicked")
-        print("Rotation: ", Block4_input_rotation.text())
-        print("Scaling: ", Block4_input_scaling.text())
-        print("Tx: ", Block4_input_TX.text())
-        print("Ty: ", Block4_input_TY.text())
-
-    # For Block5
-    def Block5_btn_load_img_clicked():
-        print("Load Image button clicked")
-
-    def Block5_btn_5_1_clicked():
-        print("Show Agumented Images button clicked")
-
-    def Block5_btn_5_2_clicked():
-        print("Show Model Structure button clicked")
-
-    def Block5_btn_5_3_clicked():
-        print("Show Acc and Loss button clicked")
-
-    def Block5_btn_5_4_clicked():
-        print("Inference button clicked")
 
     # ----------------------------------- #
     # Connect functions and btns
