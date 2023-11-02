@@ -30,21 +30,16 @@ def _GaussianBlur(img):
     return signal.convolve2d(img, kernel, mode="same", boundary="symm").astype(np.uint8)
 
 
-def Sobel(img, op):
-    if img is None:
-        print("[ERROR]: Please load image first")
-        return None
+def Sobel ( img, op ):
+    blur = cv2.GaussianBlur ( img, ( 3, 3 ), 0 )
+    padding = np.zeros ( ( blur.shape[0] + 2, blur.shape[1] + 2 ) )
+    padding[1 : -1, 1 : -1] = blur
 
-    result = signal.convolve2d(_GaussianBlur(img), op, mode="same", boundary="symm")
+    for x in range ( img.shape[0] ):
+        for y in range ( img.shape[1] ):
+            blur[x, y] = abs ( np.sum ( padding[x : x + 3, y : y + 3] * op ) )
 
-    result = abs(result)
-    result = (
-        (result - np.amin(result)) * 255 / (np.amax(result) - np.amin(result))
-    ).astype(np.uint8)
-    result = cv2.cvtColor(result, cv2.COLOR_GRAY2BGR)
-
-    return result
-
+    return blur
 
 # ----------------------------------- #
 # Define functions of each btn of related
@@ -259,6 +254,30 @@ def Block3_btn_3_3_clicked():
 
 def Block3_btn_3_4_clicked():
     print("Gradient Angle button clicked")
+
+    if image1_gray is None:
+        print ( "[ERROR]: Please load image first" )
+        return
+
+    blur = cv2.GaussianBlur ( image1_gray, ( 3, 3 ), 0 )
+    padding = np.zeros ( ( blur.shape[0] + 2, blur.shape[1] + 2 ) )
+    padding[1 : -1, 1 : -1] = blur
+    gradient_angle = np.zeros_like ( blur, dtype = 'uint16' )
+
+    for x in range ( blur.shape[0] ):
+        for y in range ( blur.shape[1] ):
+            gradient_angle[x, y] = ( np.degrees ( np.arctan2 ( np.sum ( padding[x : x + 3, y : y + 3] * np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]) ), np.sum ( padding[x : x + 3, y : y + 3] * np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]) ) ) ) + 360 ) % 360
+
+
+    mask1 = ( ( gradient_angle > 120 ) & ( gradient_angle <= 180 ) ).astype ( np.uint8 ) * 255
+    mask2 = ( ( gradient_angle > 210 ) & ( gradient_angle <= 330 ) ).astype ( np.uint8 ) * 255
+
+    cv2.imshow ( '[120, 180]', cv2.bitwise_and ( blur, mask1 ) )
+    cv2.imshow ( '[210, 330]', cv2.bitwise_and ( blur, mask2 ) )
+ 
+        
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 # For Block4
