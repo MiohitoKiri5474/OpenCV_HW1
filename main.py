@@ -284,7 +284,7 @@ def Block3_btn_3_4_clicked():
                 * np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
             )
 
-            blur[x, y] = ( result_x ** 2 + result_y ** 2 ) ** 0.5
+            blur[x, y] = (result_x**2 + result_y**2) ** 0.5
             gradient_angle[x, y] = (
                 np.degrees(np.arctan2(result_y, result_x)) + 360
             ) % 360
