@@ -275,20 +275,18 @@ def Block3_btn_3_4_clicked():
 
     for x in range(blur.shape[0]):
         for y in range(blur.shape[1]):
+            result_x = np.sum(
+                padding[x : x + 3, y : y + 3]
+                * np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+            )
+            result_y = np.sum(
+                padding[x : x + 3, y : y + 3]
+                * np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
+            )
+
+            blur[x, y] = ( result_x ** 2 + result_y ** 2 ) ** 0.5
             gradient_angle[x, y] = (
-                np.degrees(
-                    np.arctan2(
-                        np.sum(
-                            padding[x : x + 3, y : y + 3]
-                            * np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-                        ),
-                        np.sum(
-                            padding[x : x + 3, y : y + 3]
-                            * np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
-                        ),
-                    )
-                )
-                + 360
+                np.degrees(np.arctan2(result_y, result_x)) + 360
             ) % 360
 
     mask1 = ((gradient_angle > 120) & (gradient_angle <= 180)).astype(np.uint8) * 255
@@ -299,7 +297,6 @@ def Block3_btn_3_4_clicked():
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
 
 
 # For Block5
@@ -481,12 +478,12 @@ def main():
     # For Block4
     def Block4_btn_transforms_clicked():
         if image1 is None:
-            print ( "[ERROR]: Please load image first" )
+            print("[ERROR]: Please load image first")
             return
-        rotation = float ( Block4_input_rotation.text() )
-        scale = float ( Block4_input_scaling.text() )
-        tx = int ( Block4_input_TX.text() )
-        ty = int ( Block4_input_TY.text() )
+        rotation = float(Block4_input_rotation.text())
+        scale = float(Block4_input_scaling.text())
+        tx = int(Block4_input_TX.text())
+        ty = int(Block4_input_TY.text())
 
         print("Transforms button clicked")
         print("Rotation: ", rotation)
@@ -494,20 +491,17 @@ def main():
         print("Tx: ", tx)
         print("Ty: ", ty)
 
-
         h = image1.shape[0]
         w = image1.shape[1]
 
-        matrix = cv2.getRotationMatrix2D ( ( 240, 200 ), rotation, scale )
-        img = cv2.warpAffine ( image1, matrix, ( w, h ) )
-        matrix = np.float32 ( [[1, 0, tx], [0, 1, ty]] )
+        matrix = cv2.getRotationMatrix2D((240, 200), rotation, scale)
+        img = cv2.warpAffine(image1, matrix, (w, h))
+        matrix = np.float32([[1, 0, tx], [0, 1, ty]])
         img = cv2.warpAffine(img, matrix, (w, h))
-        cv2.imshow ( "Transforms", img )
-
+        cv2.imshow("Transforms", img)
 
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-
 
     Block4_btn_transforms.clicked.connect(Block4_btn_transforms_clicked)
 
