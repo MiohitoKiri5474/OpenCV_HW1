@@ -301,14 +301,6 @@ def Block3_btn_3_4_clicked():
     cv2.destroyAllWindows()
 
 
-# For Block4
-def Block4_btn_transforms_clicked():
-    print("Transforms button clicked")
-    print("Rotation: ", Block4_input_rotation.text())
-    print("Scaling: ", Block4_input_scaling.text())
-    print("Tx: ", Block4_input_TX.text())
-    print("Ty: ", Block4_input_TY.text())
-
 
 # For Block5
 def Block5_btn_load_img_clicked():
@@ -487,6 +479,36 @@ def main():
     Block3_btn_3_4.clicked.connect(Block3_btn_3_4_clicked)
 
     # For Block4
+    def Block4_btn_transforms_clicked():
+        if image1 is None:
+            print ( "[ERROR]: Please load image first" )
+            return
+        rotation = float ( Block4_input_rotation.text() )
+        scale = float ( Block4_input_scaling.text() )
+        tx = int ( Block4_input_TX.text() )
+        ty = int ( Block4_input_TY.text() )
+
+        print("Transforms button clicked")
+        print("Rotation: ", rotation)
+        print("Scaling: ", scale)
+        print("Tx: ", tx)
+        print("Ty: ", ty)
+
+
+        h = image1.shape[0]
+        w = image1.shape[1]
+
+        matrix = cv2.getRotationMatrix2D ( ( 240, 200 ), rotation, scale )
+        img = cv2.warpAffine ( image1, matrix, ( w, h ) )
+        matrix = np.float32 ( [[1, 0, tx], [0, 1, ty]] )
+        img = cv2.warpAffine(img, matrix, (w, h))
+        cv2.imshow ( "Transforms", img )
+
+
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+
     Block4_btn_transforms.clicked.connect(Block4_btn_transforms_clicked)
 
     # For Block5
