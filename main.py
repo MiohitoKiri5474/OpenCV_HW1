@@ -172,8 +172,7 @@ def Block2_btn_2_2_clicked():
     img_list = []
     for i in range(6):
         print("Bilateral Filter img producting: ", i)
-        img_list.append(cv2.bilateralFilter(image1, 0, 90, 90, 2 * i + 1))
-        cv2.imshow(str(i), img_list[i])
+        img_list.append(cv2.bilateralFilter(image1, 2 * i + 1, 90, 90))
 
     while True:
         if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -194,13 +193,18 @@ def Block2_btn_2_3_clicked():
     cv2.namedWindow("Median Filter")
     cv2.createTrackbar("m:", "Median Filter", 1, 5, update_radius)
 
+    img_list = []
+    for i in range(6):
+        print("Median Filter img producting: ", i)
+        img_list.append(cv2.medianBlur(image1, 2 * i + 1))
+
     while True:
         if cv2.waitKey(1) & 0xFF == ord("q"):
             cv2.destroyAllWindows()
             break
 
         current_radius = cv2.getTrackbarPos("m:", "Median Filter")
-        cv2.imshow("Median Filter", cv2.medianBlur(image1, 2 * current_radius + 1))
+        cv2.imshow("Median Filter", img_list[current_radius])
 
 
 # For Block3
