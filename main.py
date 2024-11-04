@@ -1,5 +1,4 @@
 import sys
-import time
 
 import cv2
 import numpy as np
@@ -109,10 +108,10 @@ def Block1_btn_1_2_clicked():
         return
 
     b, g, r = cv2.split(image1)
-    avg = (r + g + b) // 3
+    avg = (r * 0.33 + g * 0.33 + b * 0.33).astype(np.uint8)
 
     cv2.imshow("OpenCV function", cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY))
-    cv2.imshow("Average weighted", cv2.merge((avg, avg, avg)))
+    cv2.imshow("Average weighted", avg)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()

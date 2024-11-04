@@ -15,6 +15,7 @@ scipy = [
 
 numpy = "1.25.2"
 opencv_python = "4.8.1.78"
+packaging = "^23.2"
 
 
 [build-system]
